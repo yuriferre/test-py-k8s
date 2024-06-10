@@ -30,7 +30,7 @@ jobs:
     - name: Build, tag, and push docker image to Amazon ECR
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        REPOSITORY: flask-app
+        REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
         docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
@@ -48,6 +48,12 @@ jobs:
 
     - name: Update ECS Service with new image
       run: |
-        IMAGE_TAG=latest
-        aws ecs update-service --cluster flask-app-cluster --service flask-app-service --force-new-deployment --task-definition $(aws ecs describe-task-definition --task-definition flask-app-task --query "taskDefinition.taskDefinitionArn" --output text) --container-definitions $(jq -c '.[] | if .name == "flask-app" then .image = "'${{ secrets.ECR_REPOSITORY }}:$IMAGE_TAG'" else . end' <(aws ecs describe-task-definition --task-definition flask-app-task --query "taskDefinition.containerDefinitions" --output json))
+        IMAGE_TAG=${{ github.sha }}
+        TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition flask-app-task --query "taskDefinition.{family:family,networkMode:networkMode,containerDefinitions:containerDefinitions,cpu:cpu,memory:memory,executionRoleArn:executionRoleArn,taskRoleArn:taskRoleArn,requiresCompatibilities:requiresCompatibilities}" --output json)
+        
+        echo $TASK_DEFINITION | jq --arg IMAGE_TAG "$IMAGE_TAG" '.containerDefinitions[0].image = "'${{ secrets.ECR_REPOSITORY }}:$IMAGE_TAG'"' > new-task-def.json
+        
+        aws ecs register-task-definition --cli-input-json file://new-task-def.json
+        
+        aws ecs update-service --cluster flask-app-cluster --service flask-app-service --force-new-deployment
       working-directory: terraform
