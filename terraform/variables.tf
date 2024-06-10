@@ -25,3 +25,15 @@ variable "cluster_name" {
 variable "service_name" {
   default = "flask-app-service"
 }
+
+variable "min_capacity" {
+  default = 1
+}
+
+variable "max_capacity" {
+  default = 5
+}
+
+variable "cpu_target_value" {
+  default = 50
+}
