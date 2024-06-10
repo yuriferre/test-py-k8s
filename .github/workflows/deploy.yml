@@ -29,6 +29,7 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+        working-directory: terraform
 
       - name: Terraform Apply
         id: apply
@@ -36,11 +37,12 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        working-directory: terraform
 
       - name: ECS Deploy
         run: |
           ecs-cli configure --cluster flask-app-cluster --default-launch-type FARGATE --config-name flask-config --region ${{ secrets.AWS_REGION }}
-          ecs-cli compose --file docker-compose.yml service up
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        working-directory: terraform
