@@ -17,3 +17,11 @@ variable "app_port" {
 variable "desired_count" {
   default = 1
 }
+
+variable "cluster_name" {
+  default = "flask-app-cluster"
+}
+
+variable "service_name" {
+  default = "flask-app-service"
+}
