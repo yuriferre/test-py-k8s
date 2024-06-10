@@ -1,13 +1,14 @@
-Descrição dos Arquivos Terraform
-alb.tf - Criar os recursos necessarios para controlar os container via aplication load balance.
-autoscaling.tf - Cria os recursos necessário para realizar o auto escaling da api, metrica de referencia cpu > 50%.
-dashboard.tf - Cria o dashboard com monitoramento detalhado de cpu/memory e logs recentes da api.
-ecs.tf - Cria os recursos necessários para executar o serviço/container do flask-app.
-logs.tf - Cria o log group para armazenamento, retenção configurada para 7 dias.
-sg.tf - Criar os recursos referentes aos grupos de segurança.
-vpc.tf - Cria os recursos referentes a network do projeto.
+**Descrição dos Arquivos Terraform**
+	
+	•	alb.tf - Criar os recursos necessarios para controlar os container via aplication load balance.
+	•	autoscaling.tf - Cria os recursos necessário para realizar o auto escaling da api, metrica de referencia cpu > 50%.
+	•	dashboard.tf - Cria o dashboard com monitoramento detalhado de cpu/memory e logs recentes da api.
+	•	ecs.tf - Cria os recursos necessários para executar o serviço/container do flask-app.
+	•	logs.tf - Cria o log group para armazenamento, retenção configurada para 7 dias.
+	•	sg.tf - Criar os recursos referentes aos grupos de segurança.
+	•	vpc.tf - Cria os recursos referentes a network do projeto.
 
-Pipeline de CI/CD com GitHub Actions
+**Pipeline de CI/CD com GitHub Actions**
 
 .github/workflows/deploy.yml
 
@@ -22,6 +23,6 @@ O arquivo deploy.yml define o pipeline de CI/CD para automatizar o deployment da
 	•	Aplicação do Terraform: Executa o Terraform para criar/atualizar os recursos de infraestrutura.
 	•	Força o Deployment no ECS: Atualiza o serviço ECS para utilizar a nova imagem Docker, forçando um novo deployment.
 
-Considerações Finais
+**Considerações Finais**
 
-Esta configuração oferece uma solução completa para o deployment e monitoramento de uma aplicação Flask no AWS ECS Fargate, com escalabilidade automática e monitoramento detalhado. A utilização do Terraform permite a automação da infraestrutura, enquanto o GitHub Actions facilita o CI/CD, garantindo deploys contínuos e consistentes.
+O projeto oferece uma solução completa de deployment e monitoramento de uma aplicação Flask no AWS ECS Fargate, com escalabilidade automática e monitoramento detalhado. A utilização do Terraform permite a automação da infraestrutura, enquanto o GitHub Actions facilita o CI/CD.
