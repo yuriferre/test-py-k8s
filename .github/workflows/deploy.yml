@@ -32,7 +32,9 @@ jobs:
       - name: Terraform Apply
         id: apply
         run: terraform apply -auto-approve
-        working-directory: terraform
+      - name: Install ECS CLI
+        run: curl -Lo /usr/local/bin/ecs-cli https://amazon-ecs-cli.s3.amazonaws.com/ecs-cli-linux-amd64-latest
+             chmod +x /usr/local/bin/ecs-cli
       - name: ECS Deploy
         run: >
           ecs-cli configure --cluster flask-app-cluster --default-launch-type
