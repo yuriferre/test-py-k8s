@@ -50,10 +50,15 @@ jobs:
       run: |
         IMAGE_TAG=${{ github.sha }}
         TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition flask-app-task --query "taskDefinition.{family:family,networkMode:networkMode,containerDefinitions:containerDefinitions,cpu:cpu,memory:memory,executionRoleArn:executionRoleArn,taskRoleArn:taskRoleArn,requiresCompatibilities:requiresCompatibilities}" --output json)
+        NEW_TASK_DEFINITION=$(echo $TASK_DEFINITION | jq --arg IMAGE_TAG "$IMAGE_TAG" '.containerDefinitions[0].image = "'${{ secrets.ECR_REPOSITORY }}:$IMAGE_TAG'"')
         
-        echo $TASK_DEFINITION | jq --arg IMAGE_TAG "$IMAGE_TAG" '.containerDefinitions[0].image = "'${{ secrets.ECR_REPOSITORY }}:$IMAGE_TAG'"' > new-task-def.json
-        
+        # Handle optional taskRoleArn
+        TASK_ROLE_ARN=$(echo $NEW_TASK_DEFINITION | jq -r '.taskRoleArn')
+        if [ "$TASK_ROLE_ARN" == "null" ]; then
+          NEW_TASK_DEFINITION=$(echo $NEW_TASK_DEFINITION | jq 'del(.taskRoleArn)')
+        fi
+
+        echo $NEW_TASK_DEFINITION > new-task-def.json
         aws ecs register-task-definition --cli-input-json file://new-task-def.json
-        
         aws ecs update-service --cluster flask-app-cluster --service flask-app-service --force-new-deployment
       working-directory: terraform
